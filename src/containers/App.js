@@ -1,72 +1,55 @@
 import React from 'react';
+import { useState, useEffect } from 'react';
 import CardList from '../components/CardList';
 import SearchBox from '../components/SearchBox';
 import './App.css';
 import Scroll from '../components/Scroll';
 import ErrorBoundary from '../components/ErrorBoundary';
 // This component is father of all components (root)
-class App extends React.Component {
+function App() {
 
-  constructor() {
+  const [robots, setrobots] = useState([]);
+  const [searchField, setsearchField] = useState('');
 
-    super();
+  const OnSearchChange = (event) => {
 
-    this.state = {
-      robots: [],
-      searchField: ''
-    }
-
-
-  }
-  // Rule of thumb : in react except prebuilt function use arrow function always
-
-  OnSearchChange = (event) => {
-
-    this.setState({ searchField: event.target.value });
-
-
+    // this.setState({ searchField: event.target.value });
+    setsearchField(event.target.value);
 
   }
 
-  componentDidMount() {
+  useEffect(() => {
 
-    fetch('https://jsonplaceholder.typicode.com/users').then(response => response.json()).then(users => this.setState({ robots: users }));
+      // console.log("hello");
+    fetch('https://jsonplaceholder.typicode.com/users')
+      .then(response => response.json())
+      .then(users => setrobots(users));
+        //  console.log("hello");
+  },[]) // [] means useEffect code runs only during initial render.
+
+
+
+  const filterRobot = robots.filter(robots => {
+
+    return robots.name.toLowerCase().includes(searchField.toLowerCase());
 
   }
 
-  render() {
+  )
 
-    const filterRobot = this.state.robots.filter(robots => {
+  return (
+    <div className="tc">
+      <h1 className='f2'>Robofriends</h1>
+      <SearchBox Searchchange={OnSearchChange} />
 
-      return robots.name.toLowerCase().includes(this.state.searchField.toLowerCase());
-
-    }
-
-    )
-
-
-    return (
-      <div className="tc">
-        <h1 className='f2'>Robofriends</h1>
-
-
-        <SearchBox Searchchange={this.OnSearchChange} />
-
-        <Scroll>
-          <ErrorBoundary>
+      <Scroll>
+        <ErrorBoundary>
           <CardList robots={filterRobot} />
-          </ErrorBoundary>
-        </Scroll>
+        </ErrorBoundary>
+      </Scroll>
 
-
-      </div>
-    )
-
-
-
-  }
-
-
+    </div>
+  )
 
 }
 
